@@ -6,8 +6,12 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
+private const val DEBUG = true
+
 fun logE(error: Throwable, tag: String = "") = logE(error.message ?: "", tag)
-fun logE(error: String, tag: String = "") = println("${tag}:${error}")
+fun logE(error: String, tag: String = "") {
+    if (DEBUG) println("${tag}:${error}")
+}
 
 fun Closeable?.closeSafe() {
     kotlin.runCatching {
