@@ -1,12 +1,13 @@
-package com.yfc.com.yfc.socket
+package com.yfc.com.yfc.socket.simple
 
+import com.yfc.com.yfc.socket.ext.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.Socket
 import kotlin.concurrent.thread
 
 class SimpleClient(private val host: String, private val port: Int) {
-    private val tag = SimpleClient::class.simpleName ?: ""
+    val tag = SimpleClient::class.simpleName ?: ""
 
     private var socket: Socket? = null
     private var output: OutputStream? = null
@@ -86,14 +87,16 @@ class SimpleClient(private val host: String, private val port: Int) {
 
         onConnectFailed = null
         onConnected = null
-        onDisconnected = null
         onMessageReceived = null
 
         socket.closeSafe()
         output.closeSafe()
         input.closeSafe()
 
-        runOnUiThread { onDisconnected?.invoke() }
+        runOnUiThread {
+            onDisconnected?.invoke()
+            onDisconnected = null
+        }
     }
 
     fun isConnected(): Boolean = socket?.isConnected == true

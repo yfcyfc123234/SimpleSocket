@@ -1,19 +1,19 @@
-package com.yfc.com.yfc.socket
+package com.yfc.com.yfc.socket.ext
 
-import java.io.Closeable
+import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
 private const val DEBUG = true
-
-fun logE(error: Throwable, tag: String = "") = logE(error.message ?: "", tag)
-fun logE(error: String, tag: String = "") {
+private const val BASE_TAG = "SimpleSocket"
+fun logE(throwable: Throwable, tag: String = BASE_TAG) = logE(throwable.message ?: "", tag)
+fun logE(error: String, tag: String = BASE_TAG) {
     if (DEBUG) println("${tag}:${error}")
 }
 
-fun Closeable?.closeSafe() {
+fun AutoCloseable?.closeSafe() {
     kotlin.runCatching {
         this?.close()
     }.onFailure {
@@ -38,4 +38,8 @@ fun isMainThread(): Boolean {
 
 fun runOnUiThread(listener: () -> Unit) {
     listener.invoke()
+}
+
+fun getFileSavedCacheDir(): String {
+    return "D://test/".also { File(it).mkdirs() }
 }

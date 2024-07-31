@@ -1,5 +1,6 @@
-package com.yfc.com.yfc.socket
+package com.yfc.com.yfc.socket.simple
 
+import com.yfc.com.yfc.socket.ext.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.ServerSocket
@@ -7,12 +8,13 @@ import java.net.Socket
 import java.util.*
 import kotlin.concurrent.thread
 
-class SimpleServer(private val port: Int) {
-    private val tag = SimpleServer::class.simpleName ?: ""
+class SimpleServer(private val port: Int, val lineRead: Boolean = true) {
+    val tag = SimpleServer::class.simpleName ?: ""
 
     private var serverSocket: ServerSocket? = null
     private val clientHandlers = Vector<ClientHandler>()
 
+    var onCreateSuccess: ((port: Int) -> Unit)? = null
     var onCreateFailed: (() -> Boolean)? = null
     var onClientConnected: ((Socket) -> Unit)? = null
     var onClientDisconnected: ((Socket) -> Unit)? = null
@@ -24,6 +26,7 @@ class SimpleServer(private val port: Int) {
                 val serverSocket = ServerSocket(port).also { this.serverSocket = it }
 
                 logE("Server started on port: $port", tag)
+                onCreateSuccess?.invoke(port)
 
                 while (!serverSocket.isClosed) {
                     runCatching {
@@ -130,7 +133,6 @@ class SimpleServer(private val port: Int) {
 
             onCreateFailed = null
             onClientConnected = null
-            onClientDisconnected = null
             onMessageReceived = null
 
             clientSocket.closeSafe()
@@ -139,7 +141,10 @@ class SimpleServer(private val port: Int) {
 
             clientHandlers.remove(this)
 
-            runOnUiThread { onClientDisconnected?.invoke(clientSocket) }
+            runOnUiThread {
+                onClientDisconnected?.invoke(clientSocket)
+                onClientDisconnected = null
+            }
         }
 
         fun isConnected(): Boolean = clientSocket.isConnected
