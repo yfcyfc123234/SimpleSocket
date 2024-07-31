@@ -13,8 +13,7 @@ class OutputStreamHelper(private val socketHelper: SocketHelper) {
     fun sendFile(filePath: String) = sendFile(File(filePath))
     fun sendFile(file: File) {
         if (!file.exists() || file.isDirectory) return
-
-        // TODO yfc
+        sendMessage(SocketMessage(type = SocketMessageType.BYTE, filePath = file.absolutePath))
     }
 
     fun sendDataRaw(dataRaw: ByteArray) = sendMessage(SocketMessage(type = SocketMessageType.BYTE, dataRaw = dataRaw))
