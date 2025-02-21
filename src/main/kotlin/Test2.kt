@@ -1,9 +1,4 @@
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
@@ -45,7 +40,7 @@ object Test2 {
         println("testCount=${testCount} testTime=${System.currentTimeMillis() - startTime}ms")
     }
 
-//    private fun testInside(personCount: Int): Int {
+    //    private fun testInside(personCount: Int): Int {
 //        val array = IntArray(personCount) { it + 1 }
 //        var size = personCount
 //
