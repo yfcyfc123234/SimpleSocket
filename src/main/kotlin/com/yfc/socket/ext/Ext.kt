@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 private const val DEBUG = true
 private const val BASE_TAG = "SimpleSocket"
 fun logE(throwable: Throwable, tag: String = BASE_TAG) = logE(throwable.message ?: "", tag)
-fun logE(error: String, tag: String = BASE_TAG) {
+fun logE(error: Any?, tag: String = BASE_TAG) {
     if (DEBUG) println("${tag}:${error}")
 }
 
