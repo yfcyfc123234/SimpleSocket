@@ -1,3 +1,5 @@
+package test
+
 import kotlinx.coroutines.*
 
 object Test3 {

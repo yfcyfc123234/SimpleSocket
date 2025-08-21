@@ -1,4 +1,4 @@
-
+package test
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
