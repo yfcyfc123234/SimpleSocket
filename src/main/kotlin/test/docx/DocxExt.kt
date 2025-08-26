@@ -2,6 +2,7 @@ package com.yfc.test.docx
 
 import com.yfc.com.yfc.socket.ext.logE
 import org.docx4j.wml.ContentAccessor
+import org.docx4j.wml.P
 import org.jvnet.jaxb2_commons.ppp.Child
 import kotlin.reflect.KClass
 
@@ -71,7 +72,13 @@ class DocxNode(var contentAccessor: ContentAccessor? = null, var any: Any? = nul
 
     val content get() = contentAccessor ?: any
 
-    override fun toString() = content.toString()
+    override fun toString(): String {
+        return if (content is P) {
+            "${content!!::class.java.name}${content.toString()}"
+        } else {
+            content.toString()
+        }
+    }
 
     fun hasNext(index: Int) = (contentAccessor?.content?.size ?: 0) > index
     fun next(index: Int) = create(contentAccessor?.content?.getOrNull(index))

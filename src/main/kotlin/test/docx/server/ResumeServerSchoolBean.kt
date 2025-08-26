@@ -1,5 +1,7 @@
 package com.yfc.test.docx.server
 
+import com.yfc.com.yfc.socket.ext.TIME_PATTERN_YYYY_MM3
+
 data class ResumeServerSchoolBean(
     var sid: String? = "",
     var experience_name: String? = "",
@@ -11,5 +13,5 @@ data class ResumeServerSchoolBean(
 ) {
     val departmentAndRole get() = "$department $role_name"
 
-//    fun timePart(pattern: String = TIME_PATTERN_YYYY_MM3): String = timePart(start_time, end_time, pattern)
+    fun timePart(pattern: String = TIME_PATTERN_YYYY_MM3): String = timePart(start_time, end_time, pattern)
 }

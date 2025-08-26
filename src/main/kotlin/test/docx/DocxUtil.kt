@@ -12,10 +12,12 @@ import org.docx4j.mce.AlternateContent
 import org.docx4j.openpackaging.io.SaveToZipFile
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.wml.*
+import org.jvnet.jaxb2_commons.ppp.Child
 import java.io.File
 
-object TestDocx {
-    private val keywordList by lazy { TestData.createTest() }
+object DocxUtil {
+    val wmlObjectFactory by lazy { Context.getWmlObjectFactory() }
+    private val docxBean by lazy { DocxBean.createTest() }
 
     private fun test(startP: P, endP: P, centerP: List<P>) {
         val a = startP.parent as? ContentAccessor
@@ -24,8 +26,6 @@ object TestDocx {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val f = Context.getWmlObjectFactory()
-
         val template = "C:/Users/Administrator/Desktop/resume_tpl1.docx"
 
         val save = true
@@ -37,19 +37,14 @@ object TestDocx {
         val start = System.currentTimeMillis()
 
         documentPart.contents.apply {
-            val list = tree()
-                .children
-                .filter { it.node.content is P && it.children.isNotEmpty() }
+            handleChildren(this)
 
-            list.forEach {
-                val p = it.node.content as P
-//                p.content.clear()
-            }
-
+            children
             descendants
                 .also {
                     val list = it.toMutableList()
                     logE(list)
+//                    list.indexOfFirst { it.content as? P   }
                 }
                 .filter { it.toString().isEmpty() }
                 .map { it.descendants.toMutableList() }
@@ -117,6 +112,66 @@ object TestDocx {
         }
     }
 
+    fun handleChildren(document: Document) {
+        val needDeleteList = mutableListOf<DocxNode>()
+
+        val children = document.children.toMutableList()
+        val group = docxBean.group ?: mutableListOf()
+
+        var cStartIndex = -1
+        var cEndIndex = -1
+        var groupIndex = -1
+
+        run handleShow@{
+            children.forEachIndexed { index, node ->
+                val txt = (node.content as? P)?.toString() ?: ""
+
+                if (cStartIndex == -1) {
+                    val fIndex = group.indexOfFirst { txt.contains(it.haveStart) }
+                    if (fIndex >= 0) {
+                        cStartIndex = index
+                        groupIndex = fIndex
+                    }
+                } else {
+                    val fIndex = group.indexOfFirst { txt.contains(it.haveEnd) }
+                    if (fIndex == groupIndex) {
+                        cEndIndex = index
+                    }
+                }
+
+                if (cStartIndex != -1 && cEndIndex != -1 && groupIndex != -1) {
+                    val g = group.removeAt(groupIndex)
+                    logE("g=${g}")
+
+                    if (g.hideChild) {
+                        (cStartIndex..cEndIndex).forEach { needDeleteList.add(children[it]) }
+                    } else {
+                        needDeleteList.add(children[cStartIndex])
+                        needDeleteList.add(children[cEndIndex])
+
+                        val replaceList = g.replaceList ?: mutableListOf()
+                        if (replaceList.isNotEmpty()) {
+                            val template = mutableListOf<DocxNode>()
+                            (cStartIndex + 1 until cEndIndex).forEach { template.add(children[it]) }
+                            replaceList.forEach {
+
+                            }
+                            logE()
+                        }
+                    }
+
+                    cStartIndex = -1
+                    cEndIndex = -1
+                    groupIndex = -1
+                }
+            }
+        }
+
+        needDeleteList.forEach {
+            (it.content as? Child)?.removeForParent()
+        }
+    }
+
     private val afList = mutableListOf<Pair<JAXBElement<Any>, Text?>>()
     fun afterFind(element: JAXBElement<Any>, text: Text?) {
         afList.add(element to text)
@@ -129,7 +184,7 @@ object TestDocx {
             logE("findText $txt")
             if (txt.isEmpty()) return
 
-            keywordList.forEach {
+            docxBean.ac?.forEach {
                 if (it.checkHave && (txt.contains(it.haveStart) || txt.contains(it.haveEnd))) {
                     text?.findParent(P::class)?.removeForParent()
                 } else if (txt.contains(it.replace)) {

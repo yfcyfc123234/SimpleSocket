@@ -29,6 +29,9 @@ dependencies {
     // Gson can work with arbitrary Java objects including pre-existing objects that you do not have source-code of.
     // https://github.com/google/gson
     api("com.google.code.gson:gson:2.13.1")
+
+    // https://doc.hutool.cn/pages/index/#exclude%E6%96%B9%E5%BC%8F
+    api("cn.hutool:hutool-all:5.8.26")
 }
 
 tasks.test {
