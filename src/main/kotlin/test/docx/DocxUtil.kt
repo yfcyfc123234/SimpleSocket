@@ -6,41 +6,101 @@ import jakarta.xml.bind.JAXBElement
 import org.docx4j.XmlUtils
 import org.docx4j.com.microsoft.schemas.office.word.x2010.wordprocessingGroup.CTWordprocessingGroup
 import org.docx4j.com.microsoft.schemas.office.word.x2010.wordprocessingShape.CTWordprocessingShape
+import org.docx4j.dml.CTBlip
+import org.docx4j.dml.CTBlipFillProperties
+import org.docx4j.dml.CTRelativeRect
+import org.docx4j.dml.CTStretchInfoProperties
 import org.docx4j.dml.wordprocessingDrawing.Anchor
+import org.docx4j.jaxb.Context
 import org.docx4j.mce.AlternateContent
 import org.docx4j.openpackaging.io.SaveToZipFile
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
+import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage
+import org.docx4j.vml.CTFill
+import org.docx4j.vml.CTShape
 import org.docx4j.wml.*
 import org.jvnet.jaxb2_commons.ppp.Child
 import java.io.File
+import kotlin.time.DurationUnit
+import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
+
 
 object DocxUtil {
-    //    val wmlObjectFactory by lazy { Context.getWmlObjectFactory() }
+    val factory by lazy { Context.getWmlObjectFactory() }
     private val docxBean by lazy { DocxBean.createTest() }
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val save = true
         val input = "C:/Users/Administrator/Desktop/resume_tpl1.docx"
         val output = "C:/Users/Administrator/Desktop/resume_tpl1_out.docx"
 
-        val start = System.currentTimeMillis()
-
-        val wordMLPackage = WordprocessingMLPackage.load(File(input))
+        val (wordMLPackage, openTime) = measureTimedValue {
+            WordprocessingMLPackage.load(File(input))
+        }
         val documentPart = wordMLPackage.mainDocumentPart
 
-        documentPart.contents.apply {
-            handleAlternateContent(this)
-            handleChildren(this)
-        }
+        logE("openTime=${openTime.toLong(DurationUnit.MILLISECONDS)}")
 
-        if (save) {
-            SaveToZipFile(wordMLPackage).save(output)
-        } else {
-            logE(XmlUtils.marshaltoString(documentPart.getJaxbElement(), true, true))
-        }
 
-        logE("Time = ${System.currentTimeMillis() - start}")
+        val imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, File("C:/Users/Administrator/Pictures/IPAdapter_00154_.png"))
+
+        documentPart.descendants.toMutableList()[4].content
+            ?.toOrNull<AlternateContent>()
+            ?.apply {
+                choice?.getOrNull(0)
+                    ?.any
+                    ?.getOrNull(0)
+                    ?.toOrNull<Drawing>()
+                    ?.anchorOrInline
+                    ?.getOrNull(0)
+                    ?.toOrNull<Anchor>()
+                    ?.graphic
+                    ?.graphicData
+                    ?.any
+                    ?.getOrNull(0)
+                    ?.toOrNull<JAXBElement<*>>()
+                    ?.value
+                    ?.toOrNull<CTWordprocessingShape>()
+                    ?.spPr
+                    ?.apply {
+                        blipFill = CTBlipFillProperties().apply {
+                            blip = CTBlip().apply { embed = imagePart.relLast.id }
+                            stretch = CTStretchInfoProperties().apply { fillRect = CTRelativeRect() }
+                        }
+                    }
+
+                val ctFill = fallback
+                    ?.any
+                    ?.getOrNull(0)
+                    ?.toOrNull<Pict>()
+                    ?.anyAndAny
+                    ?.getOrNull(0)
+                    ?.toOrNull<CTShape>()
+                    ?.pathOrFormulasOrHandles
+                    ?.find { (it as? JAXBElement<*>)?.value is CTFill }
+                    ?.value as? CTFill
+                ctFill?.id = imagePart.relLast.id
+            }
+
+
+        val handleTime = measureTime {
+            documentPart.contents.apply {
+                handleAlternateContent(this)
+                handleChildren(this)
+            }
+        }
+        logE("handleTime=$handleTime")
+
+        val saveTime = measureTime {
+            val save = true
+            if (save) {
+                SaveToZipFile(wordMLPackage).save(output)
+            } else {
+                logE(XmlUtils.marshaltoString(documentPart.getJaxbElement(), true, true))
+            }
+        }
+        logE("saveTime=$saveTime")
     }
 
     fun handleAlternateContent(document: Document) {
@@ -235,7 +295,11 @@ object DocxUtil {
                     if (needHide) {
                         text?.findParent(P::class)?.removeForParent()
                     } else {
-                        text?.value = txt.replace(it.replace, it.data)
+                        if (it.type == DocxACBean.TYPE_TEXT) {
+                            text?.value = txt.replace(it.replace, it.data)
+                        } else if (it.type == DocxACBean.TYPE_IMAGE) {
+                            text?.value = txt.replace(it.replace, "")
+                        }
                     }
                 }
             }

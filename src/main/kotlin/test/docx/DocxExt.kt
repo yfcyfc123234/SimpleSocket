@@ -1,6 +1,5 @@
 package com.yfc.test.docx
 
-import com.yfc.com.yfc.socket.ext.logE
 import jakarta.xml.bind.JAXBElement
 import org.docx4j.wml.ContentAccessor
 import org.docx4j.wml.P
@@ -86,13 +85,8 @@ class DocxNode(var contentAccessor: ContentAccessor? = null, var any: Any? = nul
     fun next(index: Int) = create(contentAccessor?.content?.getOrNull(index))
 }
 
-fun <T : Any> Any?.toOrNull() = runCatching {
-    this?.to<T>()
-}.onFailure {
-    logE(it)
-}.getOrNull()
-
-fun <T : Any> Any.to(): T = this as T
+inline fun <reified T : Any> Any?.toOrNull(): T? = if (this is T) to() else null
+inline fun <reified T : Any> Any.to(): T = this as T
 
 fun <T : Any> Child.findParent(classz: KClass<T>) = findParent(classz.java)
 fun <T : Any> Child.findParent(classz: Class<T>): T? {
