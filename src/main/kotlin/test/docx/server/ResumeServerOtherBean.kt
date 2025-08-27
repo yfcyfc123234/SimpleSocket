@@ -9,4 +9,6 @@ data class ResumeServerOtherBean(
 ) {
     val skillStr get() = "技能:${skill}"
     val languageStr get() = "语言:${language}"
+
+    fun noData() = skill.isNullOrEmpty() && language.isNullOrEmpty() && certificate.isNullOrEmpty() && activity.isNullOrEmpty() && hobby.isNullOrEmpty()
 }

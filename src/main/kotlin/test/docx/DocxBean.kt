@@ -3,7 +3,7 @@ package com.yfc.test.docx
 import com.google.gson.Gson
 import com.yfc.test.docx.server.ResumeServerBean
 
-class DocxBean(
+data class DocxBean(
     var ac: MutableList<DocxACBean>? = null,
     var group: MutableList<DocxGroupBean>? = null,
 ) {
@@ -35,10 +35,11 @@ class DocxBean(
                         "workExperienceItemBeanList",
                         b.work?.map {
                             mutableListOf(
-                                DocxReplaceBean(it.timePart()),
-                                DocxReplaceBean(it.company_name ?: ""),
-                                DocxReplaceBean(it.department ?: ""),
-                                DocxReplaceBean(it.position_name ?: ""),
+                                DocxReplaceBean("time", it.timePart()),
+                                DocxReplaceBean("companyName", it.company_name ?: ""),
+                                DocxReplaceBean("department", it.department ?: ""),
+                                DocxReplaceBean("positionName", it.position_name ?: ""),
+                                DocxReplaceBean("description", it.description_str ?: ""),
                             )
                         }?.toMutableList(),
                         false,
@@ -49,13 +50,87 @@ class DocxBean(
                         "projectExperienceItemBeanList",
                         b.project?.map {
                             mutableListOf(
-                                DocxReplaceBean(it.timePart()),
-                                DocxReplaceBean(it.project_name ?: ""),
-                                DocxReplaceBean(it.role_name ?: ""),
+                                DocxReplaceBean("time", it.timePart()),
+                                DocxReplaceBean("projectName", it.project_name ?: ""),
+                                DocxReplaceBean("roleName", it.role_name ?: ""),
+                                DocxReplaceBean("description", it.description_str ?: ""),
                             )
                         }?.toMutableList(),
                         false,
                         b.project.isNullOrEmpty(),
+                    ),
+                    DocxGroupBean("educationExperience", null, true, b.education.isNullOrEmpty()),
+                    DocxGroupBean(
+                        "educationExperienceItemBeanList",
+                        b.education?.map {
+                            mutableListOf(
+                                DocxReplaceBean("time", it.timePart()),
+                                DocxReplaceBean("schoolName", it.school_name ?: ""),
+                                DocxReplaceBean("majorName", it.major_name ?: ""),
+                                DocxReplaceBean("degree", it.degree ?: ""),
+                                DocxReplaceBean("description", it.description_str ?: ""),
+                            )
+                        }?.toMutableList(),
+                        false,
+                        b.education.isNullOrEmpty(),
+                    ),
+                    DocxGroupBean("schoolExperience", null, true, b.school.isNullOrEmpty()),
+                    DocxGroupBean(
+                        "schoolExperienceItemBeanList",
+                        b.school?.map {
+                            mutableListOf(
+                                DocxReplaceBean("time", it.timePart()),
+                                DocxReplaceBean("experienceName", it.experience_name ?: ""),
+                                DocxReplaceBean("department", it.department ?: ""),
+                                DocxReplaceBean("roleName", it.role_name ?: ""),
+                                DocxReplaceBean("description", it.description_str ?: ""),
+                            )
+                        }?.toMutableList(),
+                        false,
+                        b.school.isNullOrEmpty(),
+                    ),
+                    DocxGroupBean("honor", null, true, b.honor.isNullOrEmpty()),
+                    DocxGroupBean(
+                        "honorItemBeanList",
+                        b.honor?.map {
+                            mutableListOf(
+                                DocxReplaceBean("time", it.awardTime()),
+                                DocxReplaceBean("honorName", it.honor_name ?: ""),
+                            )
+                        }?.toMutableList(),
+                        false,
+                        b.honor.isNullOrEmpty(),
+                    ),
+                    DocxGroupBean("other", null, true, b.other?.noData() == true),
+                    DocxGroupBean(
+                        "haveSkill",
+                        mutableListOf(mutableListOf(DocxReplaceBean("skillName", b.other?.skillStr ?: ""))),
+                        false,
+                        b.other?.skillStr.isNullOrEmpty(),
+                    ),
+                    DocxGroupBean(
+                        "haveLanguage",
+                        mutableListOf(mutableListOf(DocxReplaceBean("language", b.other?.languageStr ?: ""))),
+                        false,
+                        b.other?.languageStr.isNullOrEmpty(),
+                    ),
+                    DocxGroupBean(
+                        "haveCertificate",
+                        mutableListOf(mutableListOf(DocxReplaceBean("certificate", b.other?.certificate ?: ""))),
+                        false,
+                        b.other?.certificate.isNullOrEmpty(),
+                    ),
+                    DocxGroupBean(
+                        "haveActivity",
+                        mutableListOf(mutableListOf(DocxReplaceBean("activity", b.other?.activity ?: ""))),
+                        false,
+                        b.other?.activity.isNullOrEmpty(),
+                    ),
+                    DocxGroupBean(
+                        "haveHobby",
+                        mutableListOf(mutableListOf(DocxReplaceBean("hobby", b.other?.hobby ?: ""))),
+                        false,
+                        b.other?.hobby.isNullOrEmpty(),
                     ),
                 ),
             )
@@ -63,13 +138,16 @@ class DocxBean(
     }
 }
 
-class DocxGroupBean(
+data class DocxGroupBean(
     var keyword: String,
     var replaceList: MutableList<MutableList<DocxReplaceBean>>? = null,
     var containHave: Boolean = true,
     var hideChild: Boolean = false,
 ) {
+    @Transient
     var haveStart: String = ""
+
+    @Transient
     var haveEnd: String = ""
 
     init {
@@ -85,7 +163,11 @@ class DocxGroupBean(
     }
 }
 
-class DocxReplaceBean(var keyword: String) {
+data class DocxReplaceBean(
+    var keyword: String,
+    var data: String
+) {
+    @Transient
     var replace: String = ""
 
     init {
@@ -95,7 +177,7 @@ class DocxReplaceBean(var keyword: String) {
     }
 }
 
-class DocxACBean(
+data class DocxACBean(
     var keyword: String,
     var data: String,
     var checkHave: Boolean = true,
@@ -106,8 +188,13 @@ class DocxACBean(
         const val TYPE_IMAGE = 1
     }
 
+    @Transient
     var replace: String = ""
+
+    @Transient
     var haveStart: String = ""
+
+    @Transient
     var haveEnd: String = ""
 
     init {

@@ -1,8 +1,10 @@
 package com.yfc.test.docx
 
 import com.yfc.com.yfc.socket.ext.logE
+import jakarta.xml.bind.JAXBElement
 import org.docx4j.wml.ContentAccessor
 import org.docx4j.wml.P
+import org.docx4j.wml.Text
 import org.jvnet.jaxb2_commons.ppp.Child
 import kotlin.reflect.KClass
 
@@ -74,7 +76,7 @@ class DocxNode(var contentAccessor: ContentAccessor? = null, var any: Any? = nul
 
     override fun toString(): String {
         return if (content is P) {
-            "${content!!::class.java.name}${content.toString()}"
+            "${content!!::class.java.name}${(content as P).getText()}"
         } else {
             content.toString()
         }
@@ -106,3 +108,10 @@ fun Child.removeForParent() {
     val p = parent ?: return
     if (p is ContentAccessor) p.content?.remove(this) else (p as? Child)?.removeForParent()
 }
+
+fun P.getTextViews() = descendants
+    .filter { it.content is JAXBElement<*> }
+    .mapNotNull { (it.content as? JAXBElement<*>)?.value as? Text }
+    .toMutableList()
+
+fun P.getText() = getTextViews().joinToString("") { it.value }
