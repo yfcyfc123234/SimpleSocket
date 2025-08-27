@@ -101,13 +101,7 @@ object DocxUtil {
                         is CTWordprocessingShape -> {
                             findText(ctWordprocessing) { _, text ->
                                 if (text?.value == ac.replace) {
-                                    ctWordprocessing.spPr
-                                        ?.apply {
-                                            blipFill = CTBlipFillProperties().apply {
-                                                blip = CTBlip().apply { embed = imagePart.relLast.id }
-                                                stretch = CTStretchInfoProperties().apply { fillRect = CTRelativeRect() }
-                                            }
-                                        }
+                                    setRelId(ctWordprocessing, imagePart.relLast.id)
                                 }
                             }
                         }
@@ -118,12 +112,7 @@ object DocxUtil {
                                 ?.forEach { f ->
                                     findText(f) { _, text ->
                                         if (text?.value == ac.replace) {
-                                            (f as CTWordprocessingShape).spPr?.apply {
-                                                blipFill = CTBlipFillProperties().apply {
-                                                    blip = CTBlip().apply { embed = imagePart.relLast.id }
-                                                    stretch = CTStretchInfoProperties().apply { fillRect = CTRelativeRect() }
-                                                }
-                                            }
+                                            setRelId(f as? CTWordprocessingShape, imagePart.relLast.id)
                                         }
                                     }
                                 }
@@ -168,6 +157,15 @@ object DocxUtil {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    fun setRelId(shape: CTWordprocessingShape?, id: String) {
+        shape?.spPr?.apply {
+            blipFill = CTBlipFillProperties().apply {
+                blip = CTBlip().apply { embed = id }
+                stretch = CTStretchInfoProperties().apply { fillRect = CTRelativeRect() }
             }
         }
     }
