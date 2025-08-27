@@ -3,6 +3,7 @@ package test.docx
 import com.yfc.com.yfc.socket.ext.logE
 import com.yfc.test.docx.*
 import jakarta.xml.bind.JAXBElement
+import org.docx4j.Docx4J
 import org.docx4j.XmlUtils
 import org.docx4j.com.microsoft.schemas.office.word.x2010.wordprocessingGroup.CTWordprocessingGroup
 import org.docx4j.com.microsoft.schemas.office.word.x2010.wordprocessingShape.CTWordprocessingShape
@@ -13,7 +14,6 @@ import org.docx4j.dml.CTStretchInfoProperties
 import org.docx4j.dml.wordprocessingDrawing.Anchor
 import org.docx4j.jaxb.Context
 import org.docx4j.mce.AlternateContent
-import org.docx4j.openpackaging.io.SaveToZipFile
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage
 import org.docx4j.vml.CTFill
@@ -28,14 +28,20 @@ import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
 object DocxUtil {
-    val factory by lazy { Context.getWmlObjectFactory() }
-    private val docxBean by lazy { DocxBean.createTest() }
+    private val factory by lazy { Context.getWmlObjectFactory() }
+    private lateinit var docxBean: DocxBean
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val input = "C:/Users/Administrator/Desktop/resume_tpl1.docx"
-        val output = "C:/Users/Administrator/Desktop/resume_tpl1_out.docx"
-        val output2 = "C:/Users/Administrator/Desktop/resume_tpl1_out.html"
+        start(
+            DocxBean.createTest(),
+            "C:/Users/Administrator/Desktop/resume_tpl1.docx",
+            "C:/Users/Administrator/Desktop/resume_tpl1_out.docx",
+        )
+    }
+
+    fun start(docxBean: DocxBean, input: String, output: String) {
+        DocxUtil.docxBean = docxBean
 
         val (wordMLPackage, openTime) = measureTimedValue {
             WordprocessingMLPackage.load(File(input))
@@ -55,9 +61,13 @@ object DocxUtil {
         val saveTime = measureTime {
             val save = true
             if (save) {
-                SaveToZipFile(wordMLPackage).save(output)
+                Docx4J.save(wordMLPackage, File(output))
+//                SaveToZipFile(wordMLPackage).save(output)
 
+//                val output2 = "C:/Users/Administrator/Desktop/resume_tpl1_out.html"
 //                Docx4J.toHTML(HTMLSettings().apply { opcPackage = wordMLPackage }, FileOutputStream(File(output2)), 0)
+//
+//                val output2 = "C:/Users/Administrator/Desktop/resume_tpl1_out.pdf"
 //                Docx4J.toFO(
 //                    FOSettings().apply { opcPackage = wordMLPackage },
 //                    FileOutputStream(File(output2)),
