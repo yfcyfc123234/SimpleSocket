@@ -22,16 +22,19 @@ dependencies {
 
     // JAXB-based Java library for Word docx, Powerpoint pptx, and Excel xlsx files
     // https://github.com/plutext/docx4j
-    api("org.docx4j:docx4j-JAXB-MOXy:11.5.4")
+    implementation("org.docx4j:docx4j-JAXB-MOXy:11.5.4")
+
+    // https://mvnrepository.com/artifact/org.docx4j/docx4j-export-fo
+    implementation("org.docx4j:docx4j-export-fo:11.5.4")
 
     // Gson is a Java library that can be used to convert Java Objects into their JSON representation.
     // It can also be used to convert a JSON string to an equivalent Java object.
     // Gson can work with arbitrary Java objects including pre-existing objects that you do not have source-code of.
     // https://github.com/google/gson
-    api("com.google.code.gson:gson:2.13.1")
+    implementation("com.google.code.gson:gson:2.13.1")
 
     // https://doc.hutool.cn/pages/index/#exclude%E6%96%B9%E5%BC%8F
-    api("cn.hutool:hutool-all:5.8.26")
+    implementation("cn.hutool:hutool-all:5.8.26")
 }
 
 tasks.test {

@@ -17,14 +17,15 @@ import org.docx4j.openpackaging.io.SaveToZipFile
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage
 import org.docx4j.vml.CTFill
+import org.docx4j.vml.CTRect
 import org.docx4j.vml.CTShape
+import org.docx4j.vml.CTTextbox
 import org.docx4j.wml.*
 import org.jvnet.jaxb2_commons.ppp.Child
 import java.io.File
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
-
 
 object DocxUtil {
     val factory by lazy { Context.getWmlObjectFactory() }
@@ -34,58 +35,17 @@ object DocxUtil {
     fun main(args: Array<String>) {
         val input = "C:/Users/Administrator/Desktop/resume_tpl1.docx"
         val output = "C:/Users/Administrator/Desktop/resume_tpl1_out.docx"
+        val output2 = "C:/Users/Administrator/Desktop/resume_tpl1_out.html"
 
         val (wordMLPackage, openTime) = measureTimedValue {
             WordprocessingMLPackage.load(File(input))
         }
-        val documentPart = wordMLPackage.mainDocumentPart
 
         logE("openTime=${openTime.toLong(DurationUnit.MILLISECONDS)}")
 
-
-        val imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, File("C:/Users/Administrator/Pictures/IPAdapter_00154_.png"))
-
-        documentPart.descendants.toMutableList()[4].content
-            ?.toOrNull<AlternateContent>()
-            ?.apply {
-                choice?.getOrNull(0)
-                    ?.any
-                    ?.getOrNull(0)
-                    ?.toOrNull<Drawing>()
-                    ?.anchorOrInline
-                    ?.getOrNull(0)
-                    ?.toOrNull<Anchor>()
-                    ?.graphic
-                    ?.graphicData
-                    ?.any
-                    ?.getOrNull(0)
-                    ?.toOrNull<JAXBElement<*>>()
-                    ?.value
-                    ?.toOrNull<CTWordprocessingShape>()
-                    ?.spPr
-                    ?.apply {
-                        blipFill = CTBlipFillProperties().apply {
-                            blip = CTBlip().apply { embed = imagePart.relLast.id }
-                            stretch = CTStretchInfoProperties().apply { fillRect = CTRelativeRect() }
-                        }
-                    }
-
-                val ctFill = fallback
-                    ?.any
-                    ?.getOrNull(0)
-                    ?.toOrNull<Pict>()
-                    ?.anyAndAny
-                    ?.getOrNull(0)
-                    ?.toOrNull<CTShape>()
-                    ?.pathOrFormulasOrHandles
-                    ?.find { (it as? JAXBElement<*>)?.value is CTFill }
-                    ?.value as? CTFill
-                ctFill?.id = imagePart.relLast.id
-            }
-
-
         val handleTime = measureTime {
-            documentPart.contents.apply {
+            handleImage(wordMLPackage)
+            wordMLPackage.mainDocumentPart.contents.apply {
                 handleAlternateContent(this)
                 handleChildren(this)
             }
@@ -96,11 +56,120 @@ object DocxUtil {
             val save = true
             if (save) {
                 SaveToZipFile(wordMLPackage).save(output)
+
+//                Docx4J.toHTML(HTMLSettings().apply { opcPackage = wordMLPackage }, FileOutputStream(File(output2)), 0)
+//                Docx4J.toFO(
+//                    FOSettings().apply { opcPackage = wordMLPackage },
+//                    FileOutputStream(File(output2)),
+////            Docx4J.FLAG_EXPORT_PREFER_NONXSL,
+//                    0,
+//                )
+//        Docx4J.toPDF(wordMLPackage, FileOutputStream(File(output2)))
             } else {
-                logE(XmlUtils.marshaltoString(documentPart.getJaxbElement(), true, true))
+                logE(XmlUtils.marshaltoString(wordMLPackage.mainDocumentPart.getJaxbElement(), true, true))
             }
         }
         logE("saveTime=$saveTime")
+    }
+
+    fun handleImage(wordMLPackage: WordprocessingMLPackage) {
+        val imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, File("C:/Users/Administrator/Pictures/IPAdapter_00154_.png"))
+        val acList = docxBean.ac?.filter { it.type == DocxACBean.TYPE_IMAGE } ?: mutableListOf()
+        val alternateContentList = wordMLPackage.mainDocumentPart
+            .descendants
+            .filter { it.content is AlternateContent }
+            .map { it.content as AlternateContent }
+            .toMutableList()
+        acList.forEach { ac ->
+            alternateContentList.forEach {
+                it.apply {
+                    val ctWordprocessing = choice?.getOrNull(0)
+                        ?.any
+                        ?.getOrNull(0)
+                        ?.toOrNull<Drawing>()
+                        ?.anchorOrInline
+                        ?.getOrNull(0)
+                        ?.toOrNull<Anchor>()
+                        ?.graphic
+                        ?.graphicData
+                        ?.any
+                        ?.getOrNull(0)
+                        ?.toOrNull<JAXBElement<*>>()
+                        ?.value
+
+                    when (ctWordprocessing) {
+                        is CTWordprocessingShape -> {
+                            findText(ctWordprocessing) { _, text ->
+                                if (text?.value == ac.replace) {
+                                    ctWordprocessing.spPr
+                                        ?.apply {
+                                            blipFill = CTBlipFillProperties().apply {
+                                                blip = CTBlip().apply { embed = imagePart.relLast.id }
+                                                stretch = CTStretchInfoProperties().apply { fillRect = CTRelativeRect() }
+                                            }
+                                        }
+                                }
+                            }
+                        }
+
+                        is CTWordprocessingGroup -> {
+                            ctWordprocessing.toOrNull<CTWordprocessingGroup>()
+                                ?.wspOrGrpSpOrGraphicFrame
+                                ?.forEach { f ->
+                                    findText(f) { _, text ->
+                                        if (text?.value == ac.replace) {
+                                            (f as CTWordprocessingShape).spPr?.apply {
+                                                blipFill = CTBlipFillProperties().apply {
+                                                    blip = CTBlip().apply { embed = imagePart.relLast.id }
+                                                    stretch = CTStretchInfoProperties().apply { fillRect = CTRelativeRect() }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                        }
+
+                        else -> {
+                            // nothing
+                        }
+                    }
+
+                    val f1 = fallback
+                        ?.any
+                        ?.getOrNull(0)
+                        ?.toOrNull<Pict>()
+                        ?.anyAndAny
+                        ?.getOrNull(0)
+                        ?.toOrNull<CTShape>()
+                        ?.pathOrFormulasOrHandles
+                        ?.filter { f -> f is JAXBElement }
+                        ?.map { m -> m as JAXBElement }
+
+                    val f2 = fallback
+                        ?.any
+                        ?.getOrNull(0)
+                        ?.toOrNull<Pict>()
+                        ?.anyAndAny
+                        ?.getOrNull(0)
+                        ?.toOrNull<JAXBElement<*>>()
+                        ?.value
+                        ?.toOrNull<CTRect>()
+                        ?.pathOrFormulasOrHandles
+                        ?.filter { f -> f is JAXBElement }
+                        ?.map { m -> m as JAXBElement }
+
+                    val f = f1 ?: f2
+
+                    val ctTextbox = f?.find { f -> f.value is CTTextbox }?.value as? CTTextbox
+                    if (ctTextbox != null) {
+                        if (ctTextbox.txbxContent.content.find { f -> (f as? P)?.getText() == ac.replace } != null) {
+                            val ctFill = f.find { f -> f.value is CTFill }?.value as? CTFill
+                            ctFill?.id = imagePart.relLast.id
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun handleAlternateContent(document: Document) {
@@ -275,6 +344,27 @@ object DocxUtil {
         }
     }
 
+    private fun findText(
+        value: Any?,
+        findListener: ((element: JAXBElement<Any>, text: Text?) -> Unit)? = null,
+    ) {
+        value.toOrNull<CTWordprocessingShape>()
+            ?.txbx
+            ?.txbxContent
+            ?.content
+            ?.forEach { c1 ->
+                c1.toOrNull<P>()?.content?.forEach { c2 ->
+                    c2.toOrNull<R>()?.content?.forEach { c3 ->
+                        val element = c3.toOrNull<JAXBElement<Any>>()
+                        if (element != null) {
+                            val text = element.value?.toOrNull<Text>()
+                            findListener?.invoke(element, text)
+                        }
+                    }
+                }
+            }
+    }
+
     private val afList = mutableListOf<Pair<JAXBElement<Any>, Text?>>()
     fun afterFind(element: JAXBElement<Any>, text: Text?) {
         afList.add(element to text)
@@ -305,26 +395,5 @@ object DocxUtil {
             }
         }
         afList.clear()
-    }
-
-    private fun findText(
-        value: Any?,
-        findListener: ((element: JAXBElement<Any>, text: Text?) -> Unit)? = null,
-    ) {
-        value.toOrNull<CTWordprocessingShape>()
-            ?.txbx
-            ?.txbxContent
-            ?.content
-            ?.forEach { c1 ->
-                c1.toOrNull<P>()?.content?.forEach { c2 ->
-                    c2.toOrNull<R>()?.content?.forEach { c3 ->
-                        val element = c3.toOrNull<JAXBElement<Any>>()
-                        if (element != null) {
-                            val text = element.value?.toOrNull<Text>()
-                            findListener?.invoke(element, text)
-                        }
-                    }
-                }
-            }
     }
 }
