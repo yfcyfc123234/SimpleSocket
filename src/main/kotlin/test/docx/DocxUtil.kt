@@ -47,9 +47,9 @@ object DocxUtil {
         val pdfOutputByPoi = "C:/Users/Administrator/Desktop/wordToPdfByPoi.pdf"
         val pdfOutputByDocx4J = "C:/Users/Administrator/Desktop/wordToPdfByDocx4j.pdf"
 
-//        handleDocx(DocxBean.createTest(), docxInput, docxOutput)
+        handleDocx(DocxBean.createTest(), docxInput, docxOutput)
 
-        wordToPdfByPoi(docxInput, pdfOutputByPoi)
+        wordToPdfByPoi(docxOutput, pdfOutputByPoi)
 //        wordToPdfByDocx4J(docxInput, pdfOutputByDocx4J)
     }
 
