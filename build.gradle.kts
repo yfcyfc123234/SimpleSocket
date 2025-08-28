@@ -40,6 +40,19 @@ dependencies {
 
     // https://doc.hutool.cn/pages/index/#exclude%E6%96%B9%E5%BC%8F
     implementation("cn.hutool:hutool-all:5.8.26")
+
+    // https://poi.apache.org/components/document/index.html
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3") { exclude(group = "org.apache.poi", module = "poi-ooxml-lite") }
+    implementation("org.apache.poi:poi-ooxml-full:5.2.3")
+    implementation("org.apache.poi:poi-examples:5.2.3")
+// https://mvnrepository.com/artifact/org.apache.poi/poi-scratchpad
+    implementation("org.apache.poi:poi-scratchpad:5.2.3")
+
+    // https://mvnrepository.com/artifact/fr.opensagres.xdocreport/fr.opensagres.poi.xwpf.converter.pdf
+    implementation("fr.opensagres.xdocreport:fr.opensagres.poi.xwpf.converter.pdf:2.1.0")
+    // https://mvnrepository.com/artifact/fr.opensagres.xdocreport/fr.opensagres.xdocreport.itext.extension
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.itext.extension:2.1.0")
 }
 
 tasks.test {
