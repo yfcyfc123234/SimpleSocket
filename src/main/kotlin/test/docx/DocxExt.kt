@@ -5,6 +5,8 @@ import org.docx4j.wml.ContentAccessor
 import org.docx4j.wml.P
 import org.docx4j.wml.Text
 import org.jvnet.jaxb2_commons.ppp.Child
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
 operator fun DocxNode.iterator(): MutableIterator<DocxNode> = object : MutableIterator<DocxNode> {
@@ -85,7 +87,12 @@ class DocxNode(var contentAccessor: ContentAccessor? = null, var any: Any? = nul
     fun next(index: Int) = create(contentAccessor?.content?.getOrNull(index))
 }
 
-inline fun <reified T : Any> Any?.toOrNull(): T? = if (this is T) to() else null
+@OptIn(ExperimentalContracts::class)
+inline fun <reified T : Any> Any?.toOrNull(): T? {
+    contract { returnsNotNull() implies (this@toOrNull != null) }
+    return if (this is T) to() else null
+}
+
 inline fun <reified T : Any> Any.to(): T = this as T
 
 fun <T : Any> Child.findParent(classz: KClass<T>) = findParent(classz.java)

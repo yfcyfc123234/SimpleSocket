@@ -12,7 +12,6 @@ import org.docx4j.dml.CTBlipFillProperties
 import org.docx4j.dml.CTRelativeRect
 import org.docx4j.dml.CTStretchInfoProperties
 import org.docx4j.dml.wordprocessingDrawing.Anchor
-import org.docx4j.jaxb.Context
 import org.docx4j.mce.AlternateContent
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage
@@ -28,7 +27,7 @@ import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
 object DocxUtil {
-    private val factory by lazy { Context.getWmlObjectFactory() }
+    //    private val factory by lazy { Context.getWmlObjectFactory() }
     private lateinit var docxBean: DocxBean
 
     @JvmStatic
@@ -88,11 +87,11 @@ object DocxUtil {
         val alternateContentList = wordMLPackage.mainDocumentPart
             .descendants
             .filter { it.content is AlternateContent }
-            .map { it.content as AlternateContent }
+            .map { it.content.toOrNull<AlternateContent>() }
             .toMutableList()
         acList.forEach { ac ->
             alternateContentList.forEach {
-                it.apply {
+                it?.apply {
                     val ctWordprocessing = choice?.getOrNull(0)
                         ?.any
                         ?.getOrNull(0)
@@ -122,7 +121,7 @@ object DocxUtil {
                                 ?.forEach { f ->
                                     findText(f) { _, text ->
                                         if (text?.value == ac.replace) {
-                                            setRelId(f as? CTWordprocessingShape, imagePart.relLast.id)
+                                            setRelId(f.toOrNull<CTWordprocessingShape>(), imagePart.relLast.id)
                                         }
                                     }
                                 }
@@ -133,18 +132,18 @@ object DocxUtil {
                         }
                     }
 
-                    val f1 = fallback
+                    val elementList1 = fallback
                         ?.any
                         ?.getOrNull(0)
                         ?.toOrNull<Pict>()
                         ?.anyAndAny
                         ?.getOrNull(0)
                         ?.toOrNull<CTShape>()
-                        ?.pathOrFormulasOrHandles
+                        ?.egShapeElements
                         ?.filter { f -> f is JAXBElement }
-                        ?.map { m -> m as JAXBElement }
+                        ?.map { m -> m.to<JAXBElement<*>>() }
 
-                    val f2 = fallback
+                    val elementList2 = fallback
                         ?.any
                         ?.getOrNull(0)
                         ?.toOrNull<Pict>()
@@ -153,17 +152,16 @@ object DocxUtil {
                         ?.toOrNull<JAXBElement<*>>()
                         ?.value
                         ?.toOrNull<CTRect>()
-                        ?.pathOrFormulasOrHandles
+                        ?.egShapeElements
                         ?.filter { f -> f is JAXBElement }
-                        ?.map { m -> m as JAXBElement }
+                        ?.map { m -> m.to<JAXBElement<*>>() }
 
-                    val f = f1 ?: f2
+                    val elementList = (elementList1 ?: elementList2) ?: return
 
-                    val ctTextbox = f?.find { f -> f.value is CTTextbox }?.value as? CTTextbox
+                    val ctTextbox = elementList.find { f -> f.value is CTTextbox }?.value.toOrNull<CTTextbox>()
                     if (ctTextbox != null) {
-                        if (ctTextbox.txbxContent.content.find { f -> (f as? P)?.getText() == ac.replace } != null) {
-                            val ctFill = f.find { f -> f.value is CTFill }?.value as? CTFill
-                            ctFill?.id = imagePart.relLast.id
+                        if (ctTextbox.txbxContent.content.find { f -> f.toOrNull<P>()?.getText() == ac.replace } != null) {
+                            elementList.find { f -> f.value is CTFill }?.value.toOrNull<CTFill>()?.id = imagePart.relLast.id
                         }
                     }
                 }
@@ -173,6 +171,7 @@ object DocxUtil {
 
     fun setRelId(shape: CTWordprocessingShape?, id: String) {
         shape?.spPr?.apply {
+            noFill = null
             blipFill = CTBlipFillProperties().apply {
                 blip = CTBlip().apply { embed = id }
                 stretch = CTStretchInfoProperties().apply { fillRect = CTRelativeRect() }
@@ -183,14 +182,14 @@ object DocxUtil {
     fun handleAlternateContent(document: Document) {
         document.descendants
             .toMutableList()
-            .filter { (it.content as? P)?.getText()?.isEmpty() == true }
+            .filter { it.content.toOrNull<P>()?.getText()?.isEmpty() == true }
             .map { it.descendants.toMutableList() }
             .filter { !it.isEmpty() }
             .flatMap { it }
             .filter { it.content is AlternateContent }
-            .map { it.content as AlternateContent }
+            .map { it.content.toOrNull<AlternateContent>() }
             .forEach {
-                it.choice.forEach { c ->
+                it?.choice?.forEach { c ->
                     c.any.forEach { any ->
                         any.toOrNull<Drawing>()
                             ?.anchorOrInline
@@ -231,7 +230,7 @@ object DocxUtil {
 
         run handleShow@{
             children.forEachIndexed { index, node ->
-                val txt = (node.content as? P)?.toString() ?: ""
+                val txt = node.content.toOrNull<P>()?.getText() ?: ""
 
                 if (cStartIndex == -1) {
                     val fIndex = group.indexOfFirst { txt.contains(it.haveStart) }
@@ -248,7 +247,7 @@ object DocxUtil {
 
                 if (cStartIndex != -1 && cEndIndex != -1 && groupIndex != -1) {
                     val g = group.removeAt(groupIndex)
-                    logE("g=${g}")
+                    logE("group=${g}")
 
                     if (g.hideChild) {
                         (cStartIndex..cEndIndex).forEach { needDeleteList.add(children[it]) }
@@ -263,13 +262,13 @@ object DocxUtil {
                         if (replaceList.isNotEmpty()) {
                             if (template.isNotEmpty()) {
                                 var addIndex = cEndIndex
-                                val c = template.first().content as? Child
+                                val c = template.first().content.toOrNull<Child>()
                                 if (c != null) {
                                     val templateAll = mutableListOf<List<*>>()
                                     templateAll.add(template.map { it.content })
 
                                     (0 until replaceList.size - 1).forEach { _ ->
-                                        (c.parent as? ContentAccessor)?.content?.addAll(
+                                        c.parent.toOrNull<ContentAccessor>()?.content?.addAll(
                                             addIndex,
                                             template
                                                 .map { XmlUtils.unmarshalString(XmlUtils.marshaltoString(it.content)) }
@@ -278,10 +277,10 @@ object DocxUtil {
                                         addIndex += template.size
                                     }
 
-                                    replaceList.forEachIndexed { index, replace ->
-                                        val t = templateAll[index]
+                                    replaceList.forEachIndexed { indexR, replace ->
+                                        val t = templateAll[indexR]
                                         replace.forEach { nowR ->
-                                            val pList = t.mapNotNull { it as? P }
+                                            val pList = t.mapNotNull { it.toOrNull<P>() }
                                             val p = pList.find { it.getText().contains(nowR.replace) }
                                             if (p != null) {
                                                 val textViews = p.getTextViews()
@@ -295,7 +294,7 @@ object DocxUtil {
                                                     val runTexts = textViews.map { it.value }.toMutableList()
 
                                                     run handle@{
-                                                        runTexts.forEachIndexed { fromIndex, string ->
+                                                        runTexts.forEachIndexed { fromIndex, _ ->
                                                             (fromIndex + 1..runTexts.size).forEach { toIndex ->
                                                                 val textOld = runTexts.subList(fromIndex, toIndex).joinToString("")
                                                                 if (textOld == replaceStr) {
@@ -347,9 +346,7 @@ object DocxUtil {
             }
         }
 
-        needDeleteList.forEach {
-            (it.content as? Child)?.removeForParent()
-        }
+        needDeleteList.forEach { it.content.toOrNull<Child>()?.removeForParent() }
     }
 
     private fun findText(
