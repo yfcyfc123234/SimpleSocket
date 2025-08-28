@@ -85,7 +85,13 @@ fun String?.string2Time(
         return if (useThreeTen) {
             0L
         } else {
-            if (this.isNullOrEmpty()) 0L else DateUtil.parse(this, pattern).millisecond().toLong()
+            if (this.isNullOrEmpty()) {
+                0L
+            } else {
+                DateUtil.parse(this, pattern).let {
+                    timeUnit.convert(it.millisecond().toLong(), TimeUnit.MILLISECONDS)
+                }
+            }
         }
     }.onFailure {
         logE(it)

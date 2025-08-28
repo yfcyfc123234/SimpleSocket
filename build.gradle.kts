@@ -14,6 +14,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1") // 添加协程核心库
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.8.1") // 如果需要支持 JDK 8 的协程
 
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+//    implementation("org.slf4j:slf4j-simple:2.0.17")
+// https://mvnrepository.com/artifact/org.slf4j/slf4j-reload4j
+    implementation("org.slf4j:slf4j-reload4j:2.0.17")
+
 //    // https://poi.apache.org/components/document/index.html
 //    api("org.apache.poi:poi:5.4.1")
 //    api("org.apache.poi:poi-ooxml:5.4.1") { exclude(group = "org.apache.poi", module = "poi-ooxml-lite") }

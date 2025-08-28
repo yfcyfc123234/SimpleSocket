@@ -1,5 +1,6 @@
 package com.yfc.com.yfc.socket.ext
 
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
@@ -8,9 +9,12 @@ import java.util.concurrent.TimeUnit
 
 private const val DEBUG = true
 private const val BASE_TAG = "SimpleSocket"
-fun logE(error: Any?? = null, tag: String = BASE_TAG) {
+
+private val log by lazy { LoggerFactory.getLogger(BASE_TAG) }
+
+fun logE(error: Any? = null, tag: String = BASE_TAG) {
     error ?: return
-    if (DEBUG) println("${tag}:${if (error is Throwable) error.message else error}")
+    if (DEBUG) log.error("${tag}:${if (error is Throwable) error.message else error}")
 }
 
 fun AutoCloseable?.closeSafe() {
