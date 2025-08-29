@@ -1,7 +1,7 @@
 package test.docx
 
+import com.yfc.com.yfc.docx.*
 import com.yfc.com.yfc.socket.ext.logE
-import com.yfc.test.docx.*
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions
 import jakarta.xml.bind.JAXBElement

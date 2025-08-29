@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "2.2.0"
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 group = "com.yfc"
@@ -72,6 +73,27 @@ dependencies {
     implementation("fr.opensagres.xdocreport:fr.opensagres.poi.xwpf.converter.pdf:2.1.0")
     // https://mvnrepository.com/artifact/fr.opensagres.xdocreport/fr.opensagres.xdocreport.itext.extension
     implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.itext.extension:2.1.0")
+
+    // HTTP is the way modern applications network. It’s how we exchange data & media. Doing HTTP efficiently makes your stuff load faster and saves bandwidth.
+    // OkHttp is an HTTP client that’s efficient by default:
+    // HTTP/2 support allows all requests to the same host to share a socket.
+    // Connection pooling reduces request latency (if HTTP/2 isn’t available).
+    // Transparent GZIP shrinks download sizes.
+    // Response caching avoids the network completely for repeat requests.
+    // OkHttp perseveres when the network is troublesome: it will silently recover from common connection problems.
+    // If your service has multiple IP addresses, OkHttp will attempt alternate addresses if the first connect fails.
+    // This is necessary for IPv4+IPv6 and services hosted in redundant data centers.
+    // OkHttp supports modern TLS features (TLS 1.3, ALPN, certificate pinning). It can be configured to fall back for broad connectivity.
+    // Using OkHttp is easy. Its request/response API is designed with fluent builders and immutability.
+    // It supports both synchronous blocking calls and async calls with callbacks.
+    // https://github.com/square/okhttp
+    // define a BOM and its version
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:5.1.0"))
+    // define any required OkHttp artifacts without version
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation("com.squareup.okhttp3:okhttp-sse")
+    testImplementation("com.squareup.okhttp3:mockwebserver")
 }
 
 tasks.test {

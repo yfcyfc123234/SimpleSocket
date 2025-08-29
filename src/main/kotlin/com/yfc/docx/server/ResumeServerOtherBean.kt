@@ -1,4 +1,4 @@
-package com.yfc.test.docx.server
+package com.yfc.com.yfc.docx.server
 
 data class ResumeServerOtherBean(
     var skill: String? = "",

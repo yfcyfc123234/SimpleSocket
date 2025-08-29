@@ -9,7 +9,6 @@ import com.yfc.com.yfc.socket.helper.SocketHelper
 import com.yfc.com.yfc.socket.simple.SimpleClient
 import com.yfc.com.yfc.socket.simple.SimpleServer
 import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
 fun main() {
     testSimple()

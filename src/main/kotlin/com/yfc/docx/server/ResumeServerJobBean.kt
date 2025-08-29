@@ -1,4 +1,4 @@
-package com.yfc.test.docx.server
+package com.yfc.com.yfc.docx.server
 
 data class ResumeServerJobBean(
     var expected_industry: String? = "",
