@@ -37,6 +37,7 @@ import kotlin.time.measureTimedValue
 object DocxUtil {
     //    private val factory by lazy { Context.getWmlObjectFactory() }
     private lateinit var docxBean: DocxBean
+    private val imageFilePath by lazy { "C:/Users/Administrator/Pictures/ComfyUI_00476_.png" }
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -133,7 +134,7 @@ object DocxUtil {
     }
 
     fun handleImage(wordMLPackage: WordprocessingMLPackage) {
-        val imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, File("C:/Users/Administrator/Pictures/IPAdapter_00154_.png"))
+        val imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, File(imageFilePath))
         val acList = docxBean.ac?.filter { it.type == DocxACBean.TYPE_IMAGE } ?: mutableListOf()
         val alternateContentList = wordMLPackage.mainDocumentPart
             .descendants

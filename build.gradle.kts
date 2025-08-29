@@ -5,6 +5,25 @@ plugins {
 group = "com.yfc"
 version = "1.0-SNAPSHOT"
 
+tasks.named<Jar>("jar") {
+    archiveBaseName.set("docx-util")
+    archiveVersion.set(version.toString())
+
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+    manifest {
+        attributes(
+            "Manifest-Version" to "1.0",
+            "Main-Class" to "test.docx.DocxUtil",
+            "Implementation-Version" to version,
+        )
+    }
+
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }) {
+
+    }
+}
+
 repositories {
     mavenCentral()
 }
