@@ -44,7 +44,7 @@ dependencies {
 //    api("org.apache.poi:poi-ooxml-full:5.4.1")
 ////    api 'org.apache.poi:poi-examples:5.4.1'
 
-    // JAXB-based Java library for Word docx, Powerpoint pptx, and Excel xlsx files
+    // JAXB-based Java library for Word docx, PowerPoint pptx, and Excel xlsx files
     // https://github.com/plutext/docx4j
     implementation("org.docx4j:docx4j-JAXB-MOXy:11.5.4")
 
