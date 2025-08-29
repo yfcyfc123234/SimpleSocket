@@ -9,8 +9,6 @@ tasks.named<Jar>("jar") {
     archiveBaseName.set("docx-util")
     archiveVersion.set(version.toString())
 
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
     manifest {
         attributes(
             "Manifest-Version" to "1.0",
@@ -18,9 +16,11 @@ tasks.named<Jar>("jar") {
             "Implementation-Version" to version,
         )
     }
-
+    from("src/main/resources") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }) {
-
+        duplicatesStrategy = DuplicatesStrategy.WARN
     }
 }
 
