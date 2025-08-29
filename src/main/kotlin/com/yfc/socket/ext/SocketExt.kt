@@ -1,8 +1,8 @@
-package com.yfc.com.yfc.socket.ext
+package com.yfc.socket.ext
 
-import com.yfc.com.yfc.socket.ClientCompat
-import com.yfc.com.yfc.socket.ServerCompat
-import com.yfc.com.yfc.socket.helper.SocketHelper
+import com.yfc.socket.ClientCompat
+import com.yfc.socket.ServerCompat
+import com.yfc.socket.helper.SocketHelper
 
 enum class UseType(val hint: Int, val tag: String) {
     SERVER(100, "server"),

@@ -1,7 +1,7 @@
-package com.yfc.com.yfc.docx
+package com.yfc.docx
 
 import com.google.gson.Gson
-import com.yfc.com.yfc.docx.server.ResumeServerBean
+import com.yfc.docx.server.ResumeServerBean
 
 data class DocxBean(
     var ac: MutableList<DocxACBean>? = null,

@@ -12,7 +12,7 @@ tasks.named<Jar>("jar") {
     manifest {
         attributes(
             "Manifest-Version" to "1.0",
-            "Main-Class" to "test.docx.DocxUtil",
+            "Main-Class" to "com.yfc.docx.DocxUtil",
             "Implementation-Version" to version,
         )
     }
@@ -72,6 +72,11 @@ dependencies {
     implementation("fr.opensagres.xdocreport:fr.opensagres.poi.xwpf.converter.pdf:2.1.0")
     // https://mvnrepository.com/artifact/fr.opensagres.xdocreport/fr.opensagres.xdocreport.itext.extension
     implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.itext.extension:2.1.0")
+
+    // https://mvnrepository.com/artifact/org.jodconverter/jodconverter-core
+    implementation("org.jodconverter:jodconverter-core:4.4.11")
+    // https://mvnrepository.com/artifact/org.jodconverter/jodconverter-local
+    implementation("org.jodconverter:jodconverter-local:4.4.11")
 
     // HTTP is the way modern applications network. It’s how we exchange data & media. Doing HTTP efficiently makes your stuff load faster and saves bandwidth.
     // OkHttp is an HTTP client that’s efficient by default:

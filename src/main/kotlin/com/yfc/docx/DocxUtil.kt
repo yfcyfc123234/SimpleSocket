@@ -1,7 +1,6 @@
-package test.docx
+package com.yfc.docx
 
-import com.yfc.com.yfc.docx.*
-import com.yfc.com.yfc.socket.ext.logD
+import com.yfc.socket.ext.logD
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions
 import jakarta.xml.bind.JAXBElement
@@ -42,23 +41,32 @@ object DocxUtil {
     fun main(args: Array<String>) {
         val docxInput = "C:/Users/Administrator/Desktop/resume_tpl1.docx"
         val docxOutput = "C:/Users/Administrator/Desktop/resume_tpl1_out.docx"
+        val pdfOutputByJodConverter = "C:/Users/Administrator/Desktop/wordToPdfByJodConverter.pdf"
         val pdfOutputByPoi = "C:/Users/Administrator/Desktop/wordToPdfByPoi.pdf"
         val pdfOutputByDocx4J = "C:/Users/Administrator/Desktop/wordToPdfByDocx4j.pdf"
 
         handleDocx(DocxBean.createTest(), docxInput, docxOutput)
 
-        wordToPdfByPoi(docxOutput, pdfOutputByPoi)
+        wordToPdfByJodConverter(docxOutput, pdfOutputByJodConverter)
+//        wordToPdfByPoi(docxOutput, pdfOutputByPoi)
 //        wordToPdfByDocx4J(docxInput, pdfOutputByDocx4J)
     }
 
-    fun wordToPdfByPoi(input: String, output: String) {
+    private fun wordToPdfByJodConverter(input: String, output: String) {
+        OfficeToPdfConverter().apply {
+            start()
+            use { convertToPdf(File(input), File(output)) }
+        }
+    }
+
+    private fun wordToPdfByPoi(input: String, output: String) {
         val document = XWPFDocument(FileInputStream(input)).apply { createNumbering() }
         FileOutputStream(output).use {
             PdfConverter.getInstance().convert(document, it, PdfOptions.create())
         }
     }
 
-    fun wordToPdfByDocx4J(input: String, output: String): String {
+    private fun wordToPdfByDocx4J(input: String, output: String): String {
         val (wordMLPackage, openTime) = measureTimedValue { WordprocessingMLPackage.load(File(input)) }
 
         logD("openTime=${openTime.toLong(DurationUnit.MILLISECONDS)}")

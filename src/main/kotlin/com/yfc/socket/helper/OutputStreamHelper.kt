@@ -1,6 +1,14 @@
-package com.yfc.com.yfc.socket.helper
+package com.yfc.socket.helper
 
-import com.yfc.com.yfc.socket.ext.*
+import com.yfc.socket.ext.ReceiveType
+import com.yfc.socket.ext.SocketMessage
+import com.yfc.socket.ext.SocketMessageType
+import com.yfc.socket.ext.UseType
+import com.yfc.socket.ext.closeSafe
+import com.yfc.socket.ext.getCachedPool
+import com.yfc.socket.ext.isMainThread
+import com.yfc.socket.ext.logE
+import com.yfc.socket.ext.runOnUiThread
 import java.io.File
 
 class OutputStreamHelper(private val socketHelper: SocketHelper) {

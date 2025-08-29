@@ -1,4 +1,4 @@
-package com.yfc.com.yfc.socket.ext
+package com.yfc.socket.ext
 
 import cn.hutool.core.date.DateUtil
 import java.util.*

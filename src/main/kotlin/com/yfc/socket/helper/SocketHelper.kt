@@ -1,6 +1,11 @@
-package com.yfc.com.yfc.socket.helper
+package com.yfc.socket.helper
 
-import com.yfc.com.yfc.socket.ext.*
+import com.yfc.socket.ext.ListenerCompat
+import com.yfc.socket.ext.ReceiveType
+import com.yfc.socket.ext.SocketMessage
+import com.yfc.socket.ext.UseType
+import com.yfc.socket.ext.closeSafe
+import com.yfc.socket.ext.runOnUiThread
 import java.io.File
 import java.net.Socket
 import java.nio.charset.Charset

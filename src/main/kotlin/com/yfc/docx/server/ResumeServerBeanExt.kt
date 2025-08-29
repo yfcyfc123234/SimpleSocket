@@ -1,9 +1,9 @@
-package com.yfc.com.yfc.docx.server
+package com.yfc.docx.server
 
-import com.yfc.com.yfc.socket.ext.TIME_PATTERN_YYYY_MM3
-import com.yfc.com.yfc.socket.ext.TIME_PATTERN_YYYY_MM_DD
-import com.yfc.com.yfc.socket.ext.string2Time
-import com.yfc.com.yfc.socket.ext.time2String
+import com.yfc.socket.ext.TIME_PATTERN_YYYY_MM3
+import com.yfc.socket.ext.TIME_PATTERN_YYYY_MM_DD
+import com.yfc.socket.ext.string2Time
+import com.yfc.socket.ext.time2String
 import java.util.concurrent.TimeUnit
 
 const val TIME_SO_FAR = "至今"

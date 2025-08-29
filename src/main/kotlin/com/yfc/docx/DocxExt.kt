@@ -1,4 +1,4 @@
-package com.yfc.com.yfc.docx
+package com.yfc.docx
 
 import jakarta.xml.bind.JAXBElement
 import org.docx4j.wml.ContentAccessor

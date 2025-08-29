@@ -1,4 +1,4 @@
-package com.yfc.com.yfc.docx.server
+package com.yfc.docx.server
 
 data class ResumeServerExportRecordBean(
     var title: String? = null,

@@ -1,4 +1,4 @@
-package com.yfc.com.yfc.docx.server
+package com.yfc.docx.server
 
 data class ResumeServerBean(
     var id: String? = null,

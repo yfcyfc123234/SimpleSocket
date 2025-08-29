@@ -1,4 +1,4 @@
-package com.yfc.com.yfc.socket.ext
+package com.yfc.socket.ext
 
 import org.apache.log4j.BasicConfigurator
 import org.slf4j.LoggerFactory
@@ -32,7 +32,7 @@ fun logE(any: Any? = null, tag: String = BASE_TAG) {
 }
 
 fun AutoCloseable?.closeSafe() {
-    kotlin.runCatching {
+    runCatching {
         this?.close()
     }.onFailure {
         logE(it)

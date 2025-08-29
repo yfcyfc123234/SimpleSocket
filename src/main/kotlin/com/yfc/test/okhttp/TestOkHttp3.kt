@@ -1,7 +1,7 @@
-package com.yfc.com.yfc.test.okhttp
+package com.yfc.test.okhttp
 
-import com.yfc.com.yfc.socket.ext.logD
-import com.yfc.com.yfc.socket.ext.logE
+import com.yfc.socket.ext.logD
+import com.yfc.socket.ext.logE
 import kotlinx.coroutines.runBlocking
 import okhttp3.Headers
 import okhttp3.OkHttpClient

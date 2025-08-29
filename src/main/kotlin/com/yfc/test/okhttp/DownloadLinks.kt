@@ -1,4 +1,4 @@
-package com.yfc.com.yfc.test.okhttp
+package com.yfc.test.okhttp
 
 object DownloadLinks {
     val downloadLinksMap: Map<String, List<DownloadInfo>> by lazy {

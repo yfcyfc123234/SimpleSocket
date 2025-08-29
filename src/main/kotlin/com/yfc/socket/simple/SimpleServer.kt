@@ -1,6 +1,11 @@
-package com.yfc.com.yfc.socket.simple
+package com.yfc.socket.simple
 
-import com.yfc.com.yfc.socket.ext.*
+import com.yfc.socket.ext.closeSafe
+import com.yfc.socket.ext.getCachedPool
+import com.yfc.socket.ext.isMainThread
+import com.yfc.socket.ext.logD
+import com.yfc.socket.ext.logE
+import com.yfc.socket.ext.runOnUiThread
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.ServerSocket

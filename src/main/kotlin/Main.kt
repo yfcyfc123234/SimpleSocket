@@ -1,13 +1,13 @@
 package com.yfc
 
-import com.yfc.com.yfc.socket.ClientCompat
-import com.yfc.com.yfc.socket.ServerCompat
-import com.yfc.com.yfc.socket.ext.ReceiveType
-import com.yfc.com.yfc.socket.ext.SimpleClientSocketListener
-import com.yfc.com.yfc.socket.ext.SimpleServerSocketListener
-import com.yfc.com.yfc.socket.helper.SocketHelper
-import com.yfc.com.yfc.socket.simple.SimpleClient
-import com.yfc.com.yfc.socket.simple.SimpleServer
+import com.yfc.socket.ClientCompat
+import com.yfc.socket.ServerCompat
+import com.yfc.socket.ext.ReceiveType
+import com.yfc.socket.ext.SimpleClientSocketListener
+import com.yfc.socket.ext.SimpleServerSocketListener
+import com.yfc.socket.helper.SocketHelper
+import com.yfc.socket.simple.SimpleClient
+import com.yfc.socket.simple.SimpleServer
 import java.util.concurrent.TimeUnit
 
 fun main() {

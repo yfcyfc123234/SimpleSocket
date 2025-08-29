@@ -1,14 +1,17 @@
-package com.yfc.com.yfc.socket
+package com.yfc.socket
 
-import com.yfc.com.yfc.socket.ext.*
-import com.yfc.com.yfc.socket.helper.SocketHelper
+import com.yfc.socket.ext.ClientSocketListener
+import com.yfc.socket.ext.ListenerCompat
+import com.yfc.socket.ext.ReceiveType
+import com.yfc.socket.ext.SocketMessage
+import com.yfc.socket.ext.UseType
+import com.yfc.socket.ext.logE
+import com.yfc.socket.ext.runOnUiThread
+import com.yfc.socket.helper.SocketHelper
 import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
 import java.net.Socket
 import java.nio.charset.Charset
 import kotlin.concurrent.thread
-import kotlin.random.Random
 
 class ClientCompat(
     val host: String,

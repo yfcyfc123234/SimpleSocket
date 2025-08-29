@@ -1,6 +1,10 @@
-package com.yfc.com.yfc.socket.helper
+package com.yfc.socket.helper
 
-import com.yfc.com.yfc.socket.ext.*
+import com.yfc.socket.ext.ReceiveType
+import com.yfc.socket.ext.SocketMessage
+import com.yfc.socket.ext.SocketMessageType
+import com.yfc.socket.ext.closeSafe
+import com.yfc.socket.ext.logE
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.concurrent.thread
