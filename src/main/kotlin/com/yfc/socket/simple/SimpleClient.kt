@@ -52,7 +52,7 @@ class SimpleClient(private val host: String, private val port: Int) {
             output?.apply {
                 write(message.toByteArray())
                 flush()
-                logE("sendMessage message=${message}", tag)
+                logD("sendMessage message=${message}", tag)
             }
         }.onFailure {
             logE(it, tag)
@@ -66,7 +66,7 @@ class SimpleClient(private val host: String, private val port: Int) {
                 val b = ByteArray(2048)
                 while (input!!.read(b, 0, b.size).also { l = it } != -1) {
                     val message = String(b, 0, l)
-                    logE("message=${message}", tag)
+                    logD("message=${message}", tag)
                     if (message.isNotEmpty()) {
                         runOnUiThread { onMessageReceived?.invoke(message) }
                     }

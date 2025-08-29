@@ -1,11 +1,10 @@
 package test.docx
 
 import com.yfc.com.yfc.docx.*
-import com.yfc.com.yfc.socket.ext.logE
+import com.yfc.com.yfc.socket.ext.logD
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions
 import jakarta.xml.bind.JAXBElement
-import org.apache.log4j.BasicConfigurator
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.docx4j.Docx4J
 import org.docx4j.XmlUtils
@@ -41,8 +40,6 @@ object DocxUtil {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        BasicConfigurator.configure()
-
         val docxInput = "C:/Users/Administrator/Desktop/resume_tpl1.docx"
         val docxOutput = "C:/Users/Administrator/Desktop/resume_tpl1_out.docx"
         val pdfOutputByPoi = "C:/Users/Administrator/Desktop/wordToPdfByPoi.pdf"
@@ -64,7 +61,7 @@ object DocxUtil {
     fun wordToPdfByDocx4J(input: String, output: String): String {
         val (wordMLPackage, openTime) = measureTimedValue { WordprocessingMLPackage.load(File(input)) }
 
-        logE("openTime=${openTime.toLong(DurationUnit.MILLISECONDS)}")
+        logD("openTime=${openTime.toLong(DurationUnit.MILLISECONDS)}")
 
         wordMLPackage.fontMapper = IdentityPlusMapper().apply {
             put("隶书", PhysicalFonts.get("LiSu"))
@@ -112,7 +109,7 @@ object DocxUtil {
 
         val (wordMLPackage, openTime) = measureTimedValue { WordprocessingMLPackage.load(File(input)) }
 
-        logE("openTime=${openTime.toLong(DurationUnit.MILLISECONDS)}")
+        logD("openTime=${openTime.toLong(DurationUnit.MILLISECONDS)}")
 
         val handleTime = measureTime {
             handleImage(wordMLPackage)
@@ -121,14 +118,14 @@ object DocxUtil {
                 handleChildren(this)
             }
         }
-        logE("handleTime=$handleTime")
+        logD("handleTime=$handleTime")
 
         val saveTime = measureTime {
             //docx
             Docx4J.save(wordMLPackage, File(output))
 //                SaveToZipFile(wordMLPackage).save(output)
         }
-        logE("saveTime=$saveTime")
+        logD("saveTime=$saveTime")
 
         return output
     }
@@ -299,7 +296,7 @@ object DocxUtil {
 
                 if (cStartIndex != -1 && cEndIndex != -1 && groupIndex != -1) {
                     val g = group.removeAt(groupIndex)
-                    logE("group=${g}")
+                    logD("group=${g}")
 
                     if (g.hideChild) {
                         (cStartIndex..cEndIndex).forEach { needDeleteList.add(children[it]) }
@@ -431,7 +428,7 @@ object DocxUtil {
         afList.forEach { pair ->
             val text = pair.second
             val txt = text?.value ?: ""
-            logE("findText $txt")
+            logD("findText $txt")
             if (txt.isEmpty()) return
 
             docxBean.ac?.forEach {

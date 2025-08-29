@@ -25,14 +25,14 @@ class SimpleServer(private val port: Int, val lineRead: Boolean = true) {
             runCatching {
                 val serverSocket = ServerSocket(port).also { this.serverSocket = it }
 
-                logE("Server started on port: $port", tag)
+                logD("Server started on port: $port", tag)
                 onCreateSuccess?.invoke(port)
 
                 while (!serverSocket.isClosed) {
                     runCatching {
                         val clientSocket = serverSocket.accept()
 
-                        logE("onClientConnected clientSocket=${clientSocket}", tag)
+                        logD("onClientConnected clientSocket=${clientSocket}", tag)
 
                         val handler = ClientHandler(clientSocket).apply { start() }
                         clientHandlers.add(handler)
@@ -91,7 +91,7 @@ class SimpleServer(private val port: Int, val lineRead: Boolean = true) {
                     val b = ByteArray(2048)
                     while (input!!.read(b, 0, b.size).also { l = it } != -1) {
                         val message = String(b, 0, l)
-                        logE("message=${message}", tag)
+                        logD("message=${message}", tag)
                         if (message.isNotEmpty()) {
                             runOnUiThread { onMessageReceived?.invoke(clientSocket, message) }
                         }
@@ -118,7 +118,7 @@ class SimpleServer(private val port: Int, val lineRead: Boolean = true) {
                     write(message.toByteArray())
                     flush()
 
-                    logE("sendMessage message=${message}", tag)
+                    logD("sendMessage message=${message}", tag)
                 }
             }.onFailure {
                 logE(it, tag)

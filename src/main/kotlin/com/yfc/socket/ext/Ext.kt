@@ -1,5 +1,6 @@
 package com.yfc.com.yfc.socket.ext
 
+import org.apache.log4j.BasicConfigurator
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.Executors
@@ -10,11 +11,24 @@ import java.util.concurrent.TimeUnit
 private const val DEBUG = true
 private const val BASE_TAG = "SimpleSocket"
 
-private val log by lazy { LoggerFactory.getLogger(BASE_TAG) }
+private val loggerFactory by lazy {
+    BasicConfigurator.configure()
+    LoggerFactory.getILoggerFactory()
+}
 
-fun logE(error: Any? = null, tag: String = BASE_TAG) {
-    error ?: return
-    if (DEBUG) log.error("${tag}:${if (error is Throwable) error.message else error}")
+fun logD(any: Any? = null, tag: String = BASE_TAG) {
+    any ?: return
+    if (DEBUG) loggerFactory.getLogger(tag).debug("{}", any)
+}
+
+fun logW(any: Any? = null, tag: String = BASE_TAG) {
+    any ?: return
+    if (DEBUG) loggerFactory.getLogger(tag).warn("{}", any)
+}
+
+fun logE(any: Any? = null, tag: String = BASE_TAG) {
+    any ?: return
+    if (DEBUG) loggerFactory.getLogger(tag).error("{}", any)
 }
 
 fun AutoCloseable?.closeSafe() {

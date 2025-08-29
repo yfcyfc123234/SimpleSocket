@@ -66,54 +66,54 @@ interface ClientSocketListener {
 
 open class SimpleServerSocketListener : ServerSocketListener {
     override fun onCreateFailed(throwable: Throwable, server: ServerCompat) {
-        logE("onCreateFailed ${server.port}", server.tag)
+        logD("onCreateFailed ${server.port}", server.tag)
         logE(throwable, server.tag)
     }
 
     override fun onCreateSuccess(server: ServerCompat) {
-        logE("onCreateSuccess ${server.port}", server.tag)
+        logD("onCreateSuccess ${server.port}", server.tag)
     }
 
     override fun onClientConnected(helper: SocketHelper) {
-        logE("onClientConnected ${helper.inetAddress}", helper.tag)
+        logD("onClientConnected ${helper.inetAddress}", helper.tag)
     }
 
     override fun onClientDisconnected(helper: SocketHelper) {
-        logE("onClientDisconnected ${helper.inetAddress}", helper.tag)
+        logD("onClientDisconnected ${helper.inetAddress}", helper.tag)
     }
 
     override fun onClientMessageSend(message: SocketMessage, success: Boolean, helper: SocketHelper) {
-        logE("onClientMessageSend $success message=${message}", helper.tag)
+        logD("onClientMessageSend $success message=${message}", helper.tag)
     }
 
     override fun onClientMessageReceived(message: SocketMessage, helper: SocketHelper) {
-        logE("onClientMessageReceived message=${message}", helper.tag)
+        logD("onClientMessageReceived message=${message}", helper.tag)
     }
 
     override fun onServerStop(server: ServerCompat) {
-        logE("onServerStop", server.tag)
+        logD("onServerStop", server.tag)
     }
 }
 
 open class SimpleClientSocketListener : ClientSocketListener {
     override fun onConnectFailed(throwable: Throwable, client: ClientCompat) {
-        logE("onConnectFailed ${client.host}:${client.port}", client.tag)
+        logD("onConnectFailed ${client.host}:${client.port}", client.tag)
         logE(throwable, client.tag)
     }
 
     override fun onConnected(helper: SocketHelper) {
-        logE("onConnected ${helper.inetAddress}", helper.tag)
+        logD("onConnected ${helper.inetAddress}", helper.tag)
     }
 
     override fun onDisconnected(helper: SocketHelper) {
-        logE("onDisconnected ${helper.inetAddress}", helper.tag)
+        logD("onDisconnected ${helper.inetAddress}", helper.tag)
     }
 
     override fun onMessageSend(message: SocketMessage, success: Boolean, helper: SocketHelper) {
-        logE("onMessageSend $success message=${message}", helper.tag)
+        logD("onMessageSend $success message=${message}", helper.tag)
     }
 
     override fun onMessageReceived(message: SocketMessage, helper: SocketHelper) {
-        logE("onMessageReceived message=${message}", helper.tag)
+        logD("onMessageReceived message=${message}", helper.tag)
     }
 }
