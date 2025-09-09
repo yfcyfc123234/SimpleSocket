@@ -46,6 +46,7 @@ object DocxUtil {
         val pdfOutputByDocx4J = "C:/Users/Administrator/Desktop/wordToPdfByDocx4j.pdf"
 
         handleDocx(DocxBean.createTest(), docxInput, docxOutput)
+//        DocxEditor.editDocx(docxInput.toFile()!!, docxOutput.toFile()!!, DocxEditBean.createTest())
 
         wordToPdfByJodConverter(docxOutput, pdfOutputByJodConverter)
 //        wordToPdfByPoi(docxOutput, pdfOutputByPoi)
